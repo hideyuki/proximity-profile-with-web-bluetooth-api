@@ -190,3 +190,67 @@ class ProximityProfile extends EventEmitter {
 }
 
 window.ProximityProfile = ProximityProfile;
+
+navigator.bluetooth.requestDevice({
+  filters: [{
+    services: [
+      'link_loss',
+      'immediate_alert',
+      'tx_power'
+    ]
+  }]
+})
+  // Found
+  .then(device =>{
+    this._deviceName = device.name;
+    this._deviceId   = device.id;
+
+    this.emit(ProximityEvent.SelectedDevice, this._deviceName, this._deviceId);
+
+    return device.connectGATT();
+  })
+  // Connected GATT
+  .then(server =>{
+    this.emit(ProximityEvent.ConnectedGATT, server);
+
+    return Promise.all([
+      server.getPrimaryService('link_loss'),
+      server.getPrimaryService('immediate_alert'),
+      server.getPrimaryService('tx_power')
+    ]);
+  })
+  // Discovered services
+  .then(services =>{
+    //console.log('services', services);
+
+    this.emit(ProximityEvent.DiscoveredServices, services);
+
+    this._linkLossService       = services[0];
+    this._immediateAlertService = services[1];
+    this._txPowerService        = services[2];
+
+    return Promise.all([
+      // Link Loss Service: Alert Level(Read/Write)
+      this._linkLossService.getCharacteristic('alert_level'),
+      // Immediate Alert Service: Alert Level(WriteWithoutResponse)
+      this._immediateAlertService.getCharacteristic('alert_level'),
+      // Tx Power Service: Tx Power Level(Read)
+      this._txPowerService.getCharacteristic('tx_power_level')
+    ]);
+  })
+  // Discovered characteristics
+  .then(characteristics =>{
+    //console.log('characteristics', characteristics);
+
+    this.emit(ProximityEvent.DiscoveredCharacteristics, characteristics);
+
+    this._linkLossAlertLevelCharacteristic  = characteristics[0];
+    this._immediateAlertLevelCharacteristic = characteristics[1];
+    this._txPowerLevelCharacteristic        = characteristics[2];
+
+    this.emit(ProximityEvent.Initialized);
+  })
+  // Error
+  .catch(error =>{
+    this.emit(ProximityEvent.Error, error);
+  });

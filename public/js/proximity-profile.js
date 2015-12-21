@@ -519,5 +519,60 @@ var ProximityProfile = (function (_EventEmitter) {
 
 window.ProximityProfile = ProximityProfile;
 
+navigator.bluetooth.requestDevice({
+  filters: [{
+    services: ['link_loss', 'immediate_alert', 'tx_power']
+  }]
+})
+// Found
+.then(function (device) {
+  undefined._deviceName = device.name;
+  undefined._deviceId = device.id;
+
+  undefined.emit(ProximityEvent.SelectedDevice, undefined._deviceName, undefined._deviceId);
+
+  return device.connectGATT();
+})
+// Connected GATT
+.then(function (server) {
+  undefined.emit(ProximityEvent.ConnectedGATT, server);
+
+  return Promise.all([server.getPrimaryService('link_loss'), server.getPrimaryService('immediate_alert'), server.getPrimaryService('tx_power')]);
+})
+// Discovered services
+.then(function (services) {
+  //console.log('services', services);
+
+  undefined.emit(ProximityEvent.DiscoveredServices, services);
+
+  undefined._linkLossService = services[0];
+  undefined._immediateAlertService = services[1];
+  undefined._txPowerService = services[2];
+
+  return Promise.all([
+  // Link Loss Service: Alert Level(Read/Write)
+  undefined._linkLossService.getCharacteristic('alert_level'),
+  // Immediate Alert Service: Alert Level(WriteWithoutResponse)
+  undefined._immediateAlertService.getCharacteristic('alert_level'),
+  // Tx Power Service: Tx Power Level(Read)
+  undefined._txPowerService.getCharacteristic('tx_power_level')]);
+})
+// Discovered characteristics
+.then(function (characteristics) {
+  //console.log('characteristics', characteristics);
+
+  undefined.emit(ProximityEvent.DiscoveredCharacteristics, characteristics);
+
+  undefined._linkLossAlertLevelCharacteristic = characteristics[0];
+  undefined._immediateAlertLevelCharacteristic = characteristics[1];
+  undefined._txPowerLevelCharacteristic = characteristics[2];
+
+  undefined.emit(ProximityEvent.Initialized);
+})
+// Error
+['catch'](function (error) {
+  undefined.emit(ProximityEvent.Error, error);
+});
+
 },{"events":1}]},{},[2])(2)
 });
