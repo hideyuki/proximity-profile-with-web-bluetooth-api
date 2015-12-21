@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Proximity Profile with Web Bluetooth API</title>
+
+    <link rel="stylesheet" type="text/css" href="css/bootflat/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootflat/bootflat.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+  </head>
+  <body>
+
+    <nav class="navbar navbar-default navbar-custom" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Web Bluetooth API</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a class="nav-link" href="https://github.com/hideyuki/proximity-profile-with-web-bluetooth-api">GitHub</a></li>
+            <li><a class="nav-link current" href="http://tech.beatrobo.com/blog/2015/12/20/proximity-profile-with-web-bluetooth-api/">Blog</a></li>
+            <li><a class="nav-link" href="https://webbluetoothcg.github.io/web-bluetooth">Web Bluetooth API Draft</a></li>
+            <li><a class="nav-link" href="https://developer.bluetooth.org/gatt/profiles/Pages/ProfileViewer.aspx?u=org.bluetooth.profile.proximity.xml">Proximity Profile</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div id="doesnt-support" class="row">
+        <div class="col-md-12">
+          <div class="alert alert-danger">
+            <h5>Your browser doesn't support Web Bluetooth API</h5>
+            Please use Android Chrome Dev on Android 6.
+          </div>
+        </div>
+      </div>
+
+      <div id="error" class="row">
+        <div class="col-md-12">
+          <div id="error-body" class="alert alert-danger">
+          </div>
+        </div>
+      </div>
+
+      <div id="main">
+        <div class="row row-content">
+          <div class="col-md-12">
+            <button type="button" id="discover" class="btn btn-block">Discover Proximity Device</button>
+          </div>
+        </div>
+
+        <div class="row row-content">
+          <div class="col-md-12">
+            <div class="progress">
+              <div id="ble_progress" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+                <span class="sr-only"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="gatt" class="row row-content">
+          <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 id="device-name" class="panel-title"></h3>
+              </div>
+              <div class="panel-body">
+                <span id="device-id"></span>
+              </div>
+            </div>
+
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">Link Loss Service</h3>
+              </div>
+              <div class="panel-body">
+                <h5>alert_level: <span id="link-loss-alert-level">No value</span></h5>
+
+                <div class="col-md-12">
+                  <div id="btn-group-link-loss-alert-level" class="btn-group">
+                    <button type="button" class="btn" data-level="0">No (0)</button>
+                    <button type="button" class="btn" data-level="1">Mild (1)</button>
+                    <button type="button" class="btn" data-level="2">High (2)</button>
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <button type="button" id="read-link-loss-alert-level" class="btn btn-block">Read</button>
+                </div>
+              </div>
+            </div>
+
+            <!--div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">Immediate Alert Service</h3>
+              </div>
+              <div class="panel-body">
+                <h5>alert_level: <span id="immediate-alert-level">No value</span></h5>
+
+                <div class="col-md-12">
+                  <div id="btn-group-immediate-alert-level" class="btn-group">
+                    <button type="button" class="btn" data-level="0">No (0)</button>
+                    <button type="button" class="btn" data-level="1">Mild (1)</button>
+                    <button type="button" class="btn" data-level="2">High (2)</button>
+                  </div>
+                </div>
+              </div>
+            </div-->
+
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">Tx Power Service</h3>
+              </div>
+              <div class="panel-body">
+                <h5>tx_power_level: <span id="tx-power-level">No value</span></h5>
+
+                <div class="col-md-12">
+                  <button type="button" id="read-tx-power-level" class="btn btn-block">Read</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script id="service-template" type="text/x-handlebars-template">
+      <div class="panel panel-{{type}}">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{title}}</h3>
+        </div>
+        <div class="panel-body">
+          {{body}}
+        </div>
+      </div>
+    </script>
+
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/bootflat/bootstrap.min.js"></script>
+    <script src="js/bootflat/icheck.min.js"></script>
+    <script src="js/bootflat/jquery.fs.selecter.min.js"></script>
+    <script src="js/bootflat/jquery.fs.stepper.min.js"></script>
+    <script src="js/handlebars-v4.0.5.js"></script>
+    <script src="js/proximity-profile.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

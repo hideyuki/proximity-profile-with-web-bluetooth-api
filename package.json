@@ -1,0 +1,32 @@
+{
+  "name": "proximity-profile-with-web-bluetooth-api",
+  "version": "0.0.1",
+  "description": "proximity-profile-with-web-bluetooth-api",
+  "scripts": {
+    "serve": "node server.js",
+    "build": "browserify --entry src/proximity-profile.js -t babelify --outfile public/js/proximity-profile.js -d --s proximity-profile",
+    "build-min": "browserify --entry src/proximity-profile.js -t babelify --s proximity-profile | uglifyjs -c > public/js/proximity-profile.min.js",
+    "watch": "watchify -t babelify src/proximity-profile.js -o public/js/proximity-profile.js --s proximity-profile -v",
+    "lint": "eslint src/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hideyuki/proximity-profile-with-web-bluetooth-api.git"
+  },
+  "author": "Hideyuki Takei <takehide22@gmail.com>",
+  "license": "Apache License Version 2.0",
+  "bugs": {
+    "url": "https://github.com/hideyuki/proximity-profile-with-web-bluetooth-api/issues"
+  },
+  "homepage": "https://github.com/hideyuki/proximity-profile-with-web-bluetooth-api",
+  "devDependencies": {
+    "babelify": "^6.1.2",
+    "browserify": "^10.2.4",
+    "eslint": "^0.24.0",
+    "espower-babel": "^3.2.0",
+    "mocha": "^2.2.5",
+    "power-assert": "^0.11.0",
+    "uglifyjs": "^2.4.10",
+    "watchify": "^3.2.3"
+  }
+}

@@ -1,0 +1,23 @@
+body {
+    -webkit-text-size-adjust: 100%;
+}
+
+.row-content {
+    margin-bottom: 20px;
+}
+
+#doesnt-support, #error {
+    display: none;
+}
+
+#main {
+    display: none;
+}
+
+#gatt {
+    display: none;
+}
+
+.container [class*=col-] {
+    margin-bottom: 10px;
+}
