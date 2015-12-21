@@ -1,4 +1,5 @@
-var https = require('https'),
+var http = require('http') ,
+    https = require('https'),
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
@@ -10,7 +11,8 @@ var sslOptions = {
   requestCert: true,
   rejectUnauthorized: false
 };
-var a = https.createServer(sslOptions, function (request, response){
+
+var listener = function (request, response){
   var Response = {
     '200':function(file, filename){
       var extname = path.extname(filename);
@@ -53,7 +55,14 @@ var a = https.createServer(sslOptions, function (request, response){
       Response['200'](file, filename);
     }); 
   });
-}).listen(parseInt(port, 10));
+};
+
+if(process.env.NODE_ENV === 'production'){
+  http.createServer(listener).listen(parseInt(port, 10));
+}
+else{
+  https.createServer(sslOptions, listener).listen(parseInt(port, 10));
+}
 
 console.log('Hosted on https://localhost:' + parseInt(port, 10) + '/');
 
