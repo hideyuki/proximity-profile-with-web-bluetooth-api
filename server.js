@@ -3,7 +3,7 @@ var http = require('http') ,
     url = require('url'),
     path = require('path'),
     fs = require('fs'),
-    port = process.argv[2] || 8888;
+    port = process.env.PORT || 8888;
 var sslOptions = {
   key: fs.readFileSync('./ssl-cert/server.key'),
   cert: fs.readFileSync('./ssl-cert/server.crt'),
