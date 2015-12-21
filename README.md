@@ -8,4 +8,7 @@
 
 Proximity Profile (Link Loss Service, Immediate Alert Service, Tx Power Service) が搭載されている BLE デバイスと接続する Web Bluetooth API のサンプルコードです。
 
+[https://proximity-web-bluetooth-api.herokuapp.com/](https://proximity-web-bluetooth-api.herokuapp.com/) で実際に試すことができます。
+
 ES6でJSを記述し、BabelでES5に変換しています。
+Web Bluetooth API をハンドリングしているコードは [proximity-profile.js](https://github.com/hideyuki/proximity-profile-with-web-bluetooth-api/blob/master/src/proximity-profile.js) です。
